@@ -33,8 +33,37 @@ public class BitmapCompressor {
      */
     public static void compress() {
 
-        // TODO: complete compress()
+        String s = BinaryStdIn.readString();
+        int n = s.length();
+        char currentBit = s.charAt(0);
+        int count = 1;
 
+
+        // Look through the binary test file
+        // keep track of the consecutive 0 or 1 and write it as
+        // write the consecutive finds as 7 bits (first bit represents the
+        // bits represents whether the consecutive string of ints is full of 0s or 1s
+        // the other 6 bits represent the consecutive run size ranging from 0-63
+
+        for (int i = 0; i < n; i++) {
+            if (s.charAt(i) == currentBit) {
+                count++;
+                if (count == 127) {
+                    BinaryStdOut.write(count, 8);
+                    BinaryStdOut.write(currentBit == '1');
+                }
+
+            } else {
+                BinaryStdOut.write(count, 8);
+                BinaryStdOut.write(currentBit == '1');
+                currentBit = s.charAt(i);
+                count = 1;
+            }
+        }
+        if (count > 0) {
+            BinaryStdOut.write(count, 8);
+            BinaryStdOut.write(currentBit == '1');
+        }
         BinaryStdOut.close();
     }
 
@@ -44,8 +73,14 @@ public class BitmapCompressor {
      */
     public static void expand() {
 
-        // TODO: complete expand()
+        while (!BinaryStdIn.isEmpty()) {
+            int count = BinaryStdIn.readInt(8);
+            boolean bit = BinaryStdIn.readBoolean();
 
+            for (int i = 0; i < count; i++) {
+                BinaryStdOut.write(bit ? '1' : '0');
+            }
+        }
         BinaryStdOut.close();
     }
 
