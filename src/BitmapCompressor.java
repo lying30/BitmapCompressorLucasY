@@ -23,7 +23,7 @@
  *  @author Robert Sedgewick
  *  @author Kevin Wayne
  *  @author Zach Blick
- *  @author YOUR NAME HERE
+ *  @author Lucas Ying
  */
 public class BitmapCompressor {
 
@@ -35,34 +35,29 @@ public class BitmapCompressor {
 
         String s = BinaryStdIn.readString();
         int n = s.length();
-        char currentBit = s.charAt(0);
-        int count = 1;
-
-
-        // Look through the binary test file
-        // keep track of the consecutive 0 or 1 and write it as
-        // write the consecutive finds as 7 bits (first bit represents the
-        // bits represents whether the consecutive string of ints is full of 0s or 1s
-        // the other 6 bits represent the consecutive run size ranging from 0-63
+        char currentBit = '0';
+        int count = 0;
 
         for (int i = 0; i < n; i++) {
             if (s.charAt(i) == currentBit) {
                 count++;
-                if (count == 127) {
+                // If maximum of 255 is hit in run
+                if (count == 255) {
                     BinaryStdOut.write(count, 8);
-                    BinaryStdOut.write(currentBit == '1');
+                    count = 0;
                 }
 
             } else {
+                // Write the current run length
                 BinaryStdOut.write(count, 8);
-                BinaryStdOut.write(currentBit == '1');
+                // Switch to the next bit
                 currentBit = s.charAt(i);
                 count = 1;
             }
         }
+        // Write the final run length
         if (count > 0) {
             BinaryStdOut.write(count, 8);
-            BinaryStdOut.write(currentBit == '1');
         }
         BinaryStdOut.close();
     }
@@ -72,14 +67,18 @@ public class BitmapCompressor {
      * and writes the results to standard output.
      */
     public static void expand() {
+        // Start with 0 by default
+        char currentbit = '0';
 
         while (!BinaryStdIn.isEmpty()) {
             int count = BinaryStdIn.readInt(8);
-            boolean bit = BinaryStdIn.readBoolean();
 
+            // Write the current bit 'count' times
             for (int i = 0; i < count; i++) {
-                BinaryStdOut.write(bit ? '1' : '0');
+                BinaryStdOut.write(currentbit);
             }
+            // Flip the bit for the next run (used operator to evaluate if currentBit was a 0 and switch based off that boolean value of true or false)
+            currentbit = (currentbit == '0') ? '1' : '0';
         }
         BinaryStdOut.close();
     }
